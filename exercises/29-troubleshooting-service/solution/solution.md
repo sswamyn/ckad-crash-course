@@ -30,7 +30,7 @@ replicaset.apps/web-app-5f77f59c78   2         2         2       10m
 The Service named `web-app` is of type `ClusterIP`. You can only access the Service from within the cluster. Trying to connect to the Service by its DNS name from a temporary Pod in the same namespace won't be allowed.
 
 ```
-$ kubectl run tmp --image=busybox --restart=Never -it --rm -n y72 -- wget web-app
+$ kubectl run tmp --image=busybox:1.36.1 --restart=Never -it --rm -n y72 -- wget web-app
 Connecting to web-app (10.106.215.153:80)
 wget: can't connect to remote host (10.106.215.153): Connection refused
 pod "tmp" deleted
@@ -66,7 +66,7 @@ Session Affinity:  None
 Events:            <none>
 ```
 
-Upon inspecting the Deployment, you will find that the Pod template uses the label assignment `app=webapp`. The container port is set to 3000. This information doesn't match with the configuration of the Service. The endpoints of the `web-app` Service now points to the IP address and container port of the replicas controlled by the Deployment.
+Upon inspecting the Deployment, you will find that the Pod template uses the label assignment `app=web-app`. The container port is set to 3000. This information doesn't match with the configuration of the Service. The endpoints of the `web-app` Service now points to the IP address and container port of the replicas controlled by the Deployment.
 
 ```
 $ kubectl get endpoints -n y72
@@ -74,7 +74,7 @@ NAME      ENDPOINTS                         AGE
 web-app   10.244.0.3:3000,10.244.0.4:3000   24m
 ```
 
-Edit the live object of the Service. Change the label selector from `run=myapp` to `app=webapp`, and the target port from 3001 to 3000.
+Edit the live object of the Service. Change the label selector from `run=myapp` to `app=web-app`, and the target port from 3001 to 3000.
 
 ```
 $ kubectl edit service web-app -n y72
@@ -84,7 +84,7 @@ service/web-app edited
 After changing the Service configuration, you will find that you can open a connection to the Pod running the application.
 
 ```
-$ kubectl run tmp --image=busybox --restart=Never -it --rm -n y72 -- wget web-app
+$ kubectl run tmp --image=busybox:1.36.1 --restart=Never -it --rm -n y72 -- wget web-app
 Connecting to web-app (10.106.215.153:80)
 saving to 'index.html'
 index.html           100% |********************************|    12  0:00:00 ETA
